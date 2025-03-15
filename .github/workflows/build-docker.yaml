@@ -14,9 +14,12 @@ jobs:
               run: docker build ./api/ -t nathula132/devops-qr-code-api:latest
 
             - name: push image to docker hub
+
               run: |
                 docker login -u nathula132 -p ${{ secrets.DOCKER_HUB_TOKEN }}
                 docker push nathula132/devops-qr-code-api:latest
+
+              
 
               
               
