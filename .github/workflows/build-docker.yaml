@@ -10,20 +10,14 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: build image
+            - name: build api image
+              run: docker build ./api/ -t nathula132/devops-qr-code-api:latest
 
-              run: 
-                docker build ./api/ -t nathula132/devops-qr-code-api:latest
-                docker build ./front-end-nextjs/ -t nathula132/devops-qr-code-frontend:latest
+            - name: build frontend image
+              run: docker build ./front-end-nextjs/ -t nathula132/devops-qr-code-frontend:latest
 
-            - name: push image to docker hub
-
+            - name: push images to docker hub
               run: |
                 docker login -u nathula132 -p ${{ secrets.DOCKER_HUB_TOKEN }}
                 docker push nathula132/devops-qr-code-api:latest
                 docker push nathula132/devops-qr-code-frontend:latest
-
-              
-
-              
-              
