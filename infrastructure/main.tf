@@ -66,6 +66,9 @@ module "eks" {
 
   cluster_endpoint_public_access = true
 
+  # Add an access entry to the cluster for the cluster creator (identity used by Terraform)
+  # enable_cluster_creator_admin_permissions = true
+
   vpc_id                   = aws_vpc.main.id
   subnet_ids               = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id, aws_subnet.subnet_3.id]
   control_plane_subnet_ids = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id, aws_subnet.subnet_3.id]
@@ -76,6 +79,28 @@ module "eks" {
       max_size       = 1
       desired_size   = 1
       instance_types = ["t3.medium"]
+      iam_role_additional_policies = {s3_put_object_policy = aws_iam_policy.green_node_group_s3_policy.arn}
     }
   }
+}
+
+
+# Create an IAM policy for the green node group to access S3 Bucket
+resource "aws_iam_policy" "green_node_group_s3_policy" {
+  name        = "green-node-group-s3-policy"
+  description = "Allow green node group to put objects in the S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:s3:::myawsqrbucket/qr_codes/*"
+      },
+    ]
+  })
 }
